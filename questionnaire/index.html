@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Questionnaire</title>
+    <style>
+        /* Basic styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h2 {
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .page {
+            display: none;
+        }
+        .active {
+            display: block;
+        }
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+        input[type="text"],
+        input[type="date"],
+        input[type="email"],
+        input[type="tel"],
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .finish-page {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="questionnaire">
+            <div id="page-1" class="page active">
+                <h2>Page 1</h2>
+                <form id="form-1">
+                    <label>Surname:</label>
+                    <input type="text" name="surname" required>
+                    
+                    <label>Full Name:</label>
+                    <input type="text" name="full_name" required>
+                    
+                    <label>Sex:</label>
+                    <select name="sex" required>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                    
+                    <label>Marital Status:</label>
+                    <select name="marital_status" required>
+                        <option value="single">Single</option>
+                        <option value="married">Married</option>
+                        <option value="divorced">Divorced</option>
+                        <option value="widowed">Widowed</option>
+                    </select>
+                    
+                    <label>Date of Birth:</label>
+                    <input type="date" name="dob" required>
+                    
+                    <label>Place of Birth:</label>
+                    <input type="text" name="place_of_birth" required>
+                    
+                    <label>Country (nationality):</label>
+                    <input type="text" name="nationality" required>
+                    
+                    <label>U.S. Social Security Number:</label>
+                    <input type="text" name="ssn" required>
+                    
+                    <label>Date of Arrival in U.S.:</label>
+                    <input type="date" name="arrival_date" required>
+                    
+                    <label>Date of Departure from U.S.:</label>
+                    <input type="date" name="departure_date" required>
+                    
+                    <label>Previous US Visa History (Date Arrived and Length of Stay):</label>
+                    <input type="text" name="visa_history" required>
+                    
+                    <button type="button" onclick="nextPage(1)">Next</button>
+                </form>
+            </div>
+            <div id="page-2" class="page">
+                <h2>Page 2</h2>
+                <form id="form-2">
+                    <label>Driver’s License Number:</label>
+                    <input type="text" name="drivers_license" required>
+                    
+                    <label>State of Driver’s License:</label>
+                    <input type="text" name="license_state" required>
+                    
+                    <label>Permanent Home Address:</label>
+                    <input type="text" name="permanent_address" required>
+                    
+                    <label>US Home Address:</label>
+                    <input type="text" name="us_home_address" required>
+                    
+                    <label>Email Address:</label>
+                    <input type="email" name="email" required>
+                    
+                    <label>Primary Phone Number:</label>
+                    <input type="tel" name="phone" required>
+                    
+                    <label>Passport Number:</label>
+                    <input type="text" name="passport_number" required>
+                    
+                    <label>Passport Date of Issue:</label>
+                    <input type="date" name="passport_issue_date" required>
+                    
+                    <label>Passport Expiration Date:</label>
+                    <input type="date" name="passport_expiration_date" required>
+                    
+                    <label>Father's Name:</label>
+                    <input type="text" name="father_name" required>
+                    
+                    <label>Mother's Name:</label>
+                    <input type="text" name="mother_name" required>
+                    
+                    <label>Work History (Company Names in Chronological Order):</label>
+                    <input type="text" name="work_history" required>
+                    
+                    <label>Education History (Institution Names in Chronological Order):</label>
+                    <input type="text" name="education_history" required>
+                    
+                    <button type="button" onclick="finish()">Finish</button>
+                </form>
+            </div>
+            <div id="finish-page" class="page finish-page">
+                <h2>Finish</h2>
+                <label>Email:</label>
+                <input type="email" id="email" required>
+                <br>
+                <button onclick="sendEmail()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let answers = {};
+
+        function nextPage(currentPage) {
+            const form = document.getElementById(`form-${currentPage}`);
+            const formData = new FormData(form);
+            formData.forEach((value, key) => {
+                answers[key] = value;
+            });
+            document.getElementById(`page-${currentPage}`).classList.remove('active');
+            document.getElementById(`page-${currentPage + 1}`).classList.add('active');
+        }
+
+        function finish() {
+            document.getElementById('page-2').classList.remove('active');
+            document.getElementById('finish-page').classList.add('active');
+        }
+
+        function sendEmail() {
+            const email = document.getElementById('email').value;
+            fetch('http://localhost:8000/send-email', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, answers })
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                alert(data.message);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to send email.');
+            });
+        }
+    </script>
+</body>
+</html>
